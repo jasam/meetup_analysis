@@ -14,7 +14,11 @@ def dataScientistsFunction():
     for item in data["tables"]:
         for result in item["results"]:
              scientists.append(result["memname_link/_text"])
-    return scientists
+    return ', '.join(scientists)
+    
+@app.route('/readHello')
+def getRequestHello():
+	return "Hi, I got your GET Request!"   
   
 if __name__ == '__main__':
     app.debug = True
