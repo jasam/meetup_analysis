@@ -1,3 +1,7 @@
+#Autor: Javier Rey
+#Web service publication using REST and web scraping to: http://www.meetup.com/Big-Data-Science-Bogota
+#Services: getDataScientistsFunction -> return all meetup members
+
 from flask import Flask, jsonify
 from urllib.request import Request, urlopen
 import json
@@ -5,7 +9,7 @@ import json
 app = Flask(__name__) 
 
 @app.route('/dataScientists')
-def dataScientistsFunction():
+def getDataScientistsFunction():
     scientists = []
     data_scientists = {}
     qx_data_scientist = 1063
@@ -14,6 +18,7 @@ def dataScientistsFunction():
     member_number = 0
     for i in range(0, int(quantity_pages) + 1):
         offset = i * 20 
+        print(url.format(offset))
         html = urlopen(url.format(offset)).read()
         data = json.loads(html.decode())
         for item in data["tables"]:
@@ -32,11 +37,15 @@ def dataScientistsFunction():
                     data_scientists["role"] = ""
                     
                 member_number = member_number + 1
-                data_scientists["member_number"] =  member_number
+                data_scientists["member_number"] = member_number
 
                 scientists.append(data_scientists.copy())
 
-    return jsonify(results=scientists)
+    '''web scraping is not a silver bullet, despite that "import.io" is a great library, this continues being a black box 
+    and is not possible understand his behavior some times.'''
+    #clean empty records
+    clean_scientists = [item for item in scientists if item["name"] != ""]
+    return jsonify(results=clean_scientists)
     
 if __name__ == '__main__':
     app.debug = True
